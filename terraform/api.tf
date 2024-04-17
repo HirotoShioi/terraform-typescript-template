@@ -12,23 +12,23 @@ resource "aws_apigatewayv2_api" "api_gateway" {
 resource "aws_lambda_permission" "allow_lambda_invoke" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.hello_world_lambda.function_name
+  function_name = module.hello.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.api_gateway.execution_arn}/*/*/*"
 }
 
-resource "aws_apigatewayv2_integration" "hello_world_integration" {
+resource "aws_apigatewayv2_integration" "hello_world" {
   api_id                 = aws_apigatewayv2_api.api_gateway.id
   integration_type       = "AWS_PROXY"
   integration_method     = "POST"
   payload_format_version = "2.0"
-  integration_uri        = aws_lambda_function.hello_world_lambda.invoke_arn
+  integration_uri        = module.hello.invoke_arn
 }
 
-resource "aws_apigatewayv2_route" "hello_world_route" {
+resource "aws_apigatewayv2_route" "hello_world" {
   api_id    = aws_apigatewayv2_api.api_gateway.id
   route_key = "GET /hello"
-  target    = "integrations/${aws_apigatewayv2_integration.hello_world_integration.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.hello_world.id}"
 }
 
 resource "aws_apigatewayv2_stage" "apigw_stage" {
@@ -41,7 +41,7 @@ resource "aws_apigatewayv2_deployment" "deploy_apigw" {
   api_id = aws_apigatewayv2_api.api_gateway.id
   depends_on = [
     aws_apigatewayv2_stage.apigw_stage,
-    aws_apigatewayv2_route.hello_world_route
+    aws_apigatewayv2_route.hello_world
   ]
 
   lifecycle {

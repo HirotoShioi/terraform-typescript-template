@@ -2,7 +2,7 @@ const esbuild = require('esbuild')
 
 esbuild
   .build({
-    entryPoints: ['src/handlers/helloWorld.ts'],
+    entryPoints: ['src/lambdas/*.ts'],
     bundle: true,
     platform: 'node',
     target: 'es2020',
